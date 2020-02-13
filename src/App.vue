@@ -7,6 +7,8 @@
         <template v-for="product in products">
           <div class="item" :key="product.code">
             <img :src="product.images[3].url" />
+            <div>{{product.name}}</div>
+            <div>{{product.price.formattedValue}}</div>
           </div>
         </template>
         <template v-for="d in decorators">
@@ -104,7 +106,7 @@ export default {
 }
 
 .container-3-col {
-  grid-auto-rows: 339px;
+  grid-auto-rows: auto;
   grid-template-columns: repeat(3, 1fr);
   grid-column-gap: 15px;
   grid-row-gap: 15px;
@@ -112,18 +114,19 @@ export default {
 }
 
 .container-3-col .item {
-  border: solid black 1px;
+  /* border: solid black 1px; */
+  max-width: 250px;
 }
 
 .container-3-col .item img {
   width: 100%;
-  height: 100%;
+  /* height: auto; */
 }
 
 .two-col {
   grid-column: span 2;
-  border: solid black 1px;
-  background-color: rgb(163, 194, 240);
+  /* border: solid black 1px; */
+  /* background-color: rgb(163, 194, 240); */
 }
 
 .left {
@@ -135,11 +138,15 @@ export default {
   grid-column-end: 4;
 }
 
+.left, .right {
+  height: auto;
+}
+
 .full {
   grid-column: 1 / -1;
   /* height: 250px; */
-  border: solid black 1px;
-  background-color: rgb(218, 218, 218);
+  /* border: solid black 1px; */
+  /* background-color: rgb(218, 218, 218); */
   grid-auto-rows: auto;
 }
 
