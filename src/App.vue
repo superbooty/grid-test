@@ -104,7 +104,7 @@ export default {
 }
 
 .container-3-col {
-  grid-auto-rows: 300px;
+  grid-auto-rows: 339px;
   grid-template-columns: repeat(3, 1fr);
   grid-column-gap: 15px;
   grid-row-gap: 15px;
