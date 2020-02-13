@@ -109,6 +109,7 @@ export default {
 }
 
 .container-col {
+  justify-items: center;
   grid-auto-rows: auto;
   grid-template-columns: repeat(2, 1fr);
   grid-column-gap: 15px;
@@ -154,7 +155,7 @@ export default {
 }
 
 
-@media screen and (min-width: 800px) {
+@media screen and (min-width: 600px) {
   .container-col {
     grid-auto-rows: auto;
     grid-template-columns: repeat(3, 1fr);
