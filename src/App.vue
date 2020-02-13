@@ -45,7 +45,7 @@ export default {
             }
           },
           {
-            row: 5,
+            row: 6,
             pos: 'right',
             type: 'two-col',
             content: {
@@ -104,7 +104,7 @@ export default {
 }
 
 .container-3-col {
-  grid-auto-rows: auto;
+  grid-auto-rows: 300px;
   grid-template-columns: repeat(3, 1fr);
   grid-column-gap: 15px;
   grid-row-gap: 15px;
@@ -117,6 +117,7 @@ export default {
 
 .container-3-col .item img {
   width: 100%;
+  height: 100%;
 }
 
 .two-col {
@@ -136,9 +137,10 @@ export default {
 
 .full {
   grid-column: 1 / -1;
-  height: 250px;
+  /* height: 250px; */
   border: solid black 1px;
   background-color: rgb(218, 218, 218);
+  grid-auto-rows: auto;
 }
 
 .page {
