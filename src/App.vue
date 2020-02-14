@@ -29,35 +29,7 @@ export default {
   name: "App",
   decorator: null,
   data: () => ({
-    decorators: [
-      {
-        row: 2,
-        pos: "none",
-        type: "full",
-        content: {
-          url:
-            "https://images.contentstack.io/v3/assets/blt2d702d64bab5cd4d/blt0630067229f3e757/5e2ff91d507d2f74fb78c3e8/20H1_EU_February_HP_Refresh_Hero_BalloonJeans_Desktop_V2.jpg?width=1560&format=pjpg&quality=90"
-        }
-      },
-      {
-        row: 3,
-        pos: "left",
-        type: "two-col",
-        content: {
-          url:
-            "https://images.contentstack.io/v3/assets/blt2d702d64bab5cd4d/blt04212de7f2aedc90/5e3030fbe147ae4537d92d1f/sh_50193_chino.jpg?width=1030&format=pjpg&quality=90"
-        }
-      },
-      {
-        row: 6,
-        pos: "right",
-        type: "two-col",
-        content: {
-          url:
-            "https://images.contentstack.io/v3/assets/blt2d702d64bab5cd4d/blt2b2050905f6ee60e/5e2edce438beb045b8566bf3/20_H1_LVC_HomepageA2_Desktop.jpg?width=538&format=pjpg&quality=90"
-        }
-      }
-    ],
+    decorators: null,
     cols: 3, // this value should come from testing the device type
     products: null
   }),
@@ -92,7 +64,15 @@ export default {
       .then(myJson => {
         console.log(myJson);
         this.products = myJson;
-        console.log("PRODUCTS :: ", this.products);
+      });
+
+      fetch("mocks/decorators.json")
+      .then(response => {
+        return response.json();
+      })
+      .then(myJson => {
+        console.log(myJson);
+        this.decorators = myJson;
       });
   }
 };
