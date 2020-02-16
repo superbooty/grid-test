@@ -44,7 +44,7 @@ export default {
   
   data: () => ({
     decorators: [],
-    cols: 3, // this value should come from testing the device type
+    cols: 2, // this value should come from testing the device type
     products: null,
   }),
   components: {
@@ -57,11 +57,18 @@ export default {
       rowNum = rowNum | 0;
       let itemPlacement = (i + 1 + this.cols) - (this.cols * rowNum);
       // check if item tile is decorated
+      let caonDecorateCommerce = false;
+      if (this.cols > 2 && (itemPlacement == 1 || itemPlacement == 2)) {
+        caonDecorateCommerce = true;
+      }
+      if (this.cols < 3 && itemPlacement == 1) {
+        caonDecorateCommerce = true;
+      }
       if (this.decorators != null) {
         const decorators = this.decorators.filter(decorator => {
           return decorator.row == rowNum && decorator.context === "commerce";
         });
-        return decorators.length > 0 && (itemPlacement == 1 || itemPlacement == 2);
+        return decorators.length > 0 && caonDecorateCommerce;
       }
       return false;
     },
@@ -117,6 +124,14 @@ export default {
         console.log(myJson);
         this.products = myJson;
       });
+  },
+  mounted() {
+    const width = window.innerWidth;
+    if (width < 600) {
+      this.cols = 2;
+    } else {
+      this.cols = 3;
+    }
   }
 };
 </script>
@@ -171,7 +186,7 @@ export default {
 
 .decorated {
     max-width: 75vw !important;
-    grid-column: span 2 !important;
+    grid-column: 1/3 !important;
 }
 
 @media screen and (min-width: 600px) {
