@@ -3,17 +3,22 @@
     <img alt="Vue logo" src="./assets/logo.png" />
     <HelloWorld msg="Welcome to Your Vue.js App" />
     <div class="page">
-      <div class="container-col">
-        <template v-for="product in products">
-          <div class="item" :key="product.code">
-            <img :src="product.images[3].url" />
-            <div>{{product.name}}</div>
-            <div>{{product.price.formattedValue}}</div>
+      <div v-if="decorators != null" class="container-col">
+        <template v-for="(d, i) in decorators">
+          <div
+            v-if="d.context == 'content'"
+            :class="[d.pos]"
+            :style="{'grid-row': d.row}"
+            :key="`${d.row}-d-${i}`"
+          >
+            <decorator :content="d.content"></decorator>
           </div>
         </template>
-        <template v-for="d in decorators">
-          <div :class="[d.type, d.pos]" :style="{'grid-row': d.row}" :key="`${d.row}-d`">
-            <decorator :content="d.content"></decorator>
+        <template v-for="commerce in computedCommerce">
+          <div class="item" :class="{decorated: commerce.isDecorated}" :key="commerce.product.code">
+            <img :class="{'img-decorated': commerce.isDecorated}" :src="commerce.product.images[3].url" />
+            <div>{{commerce.product.name}}</div>
+            <div>{{commerce.product.price.formattedValue}}</div>
           </div>
         </template>
       </div>
@@ -27,36 +32,58 @@ import Decorator from "./components/Decorator.vue";
 
 export default {
   name: "App",
-  decorator: null,
+  
   data: () => ({
-    decorators: null,
+    decorators: [],
     cols: 3, // this value should come from testing the device type
-    products: null
+    products: null,
   }),
   components: {
     HelloWorld,
     Decorator
   },
   methods: {
-    rowHasDecorator(rowNum) {
-      console.log(rowNum);
-      const decorators = this.decorators.filter(val => {
-        console.log("FOUND :: ", val.row == rowNum);
-        return val.row == rowNum;
-      });
-      console.log("DECORATORS :: ", decorators);
-      if (decorators.length > 0) {
-        this.decorator = decorators[0];
+    isDecoratedCommerce(i) {
+      let rowNum = (i + this.cols) / this.cols;
+      rowNum = rowNum | 0;
+      let itemPlacement = (i + 1 + this.cols) - (this.cols * rowNum);
+      // check if item tile is decorated
+      if (this.decorators != null) {
+        const decorators = this.decorators.filter(decorator => {
+          return decorator.row == rowNum && decorator.context === "commerce";
+        });
+        return decorators.length > 0 && (itemPlacement == 1 || itemPlacement == 2);
       }
-      return decorators.length > 0;
+      return false;
     }
   },
   computed: {
     currentDecorator() {
       return this.decorator;
+    },
+    computedCommerce() {
+      let commerceProducts = [];
+      if (this.products != null) {
+        this.products.forEach((product, i) => {
+          let commerceProduct = {
+            product: product,
+          }
+          commerceProduct.isDecorated = this.isDecoratedCommerce(i);
+          commerceProducts.push(commerceProduct);
+        });
+      }
+      return commerceProducts;
     }
   },
-  mounted() {
+  created() {
+    fetch("mocks/decorators.json")
+      .then(response => {
+        return response.json();
+      })
+      .then(myJson => {
+        console.log(myJson);
+        this.decorators = myJson;
+      });
     fetch("mocks/products.json")
       .then(response => {
         return response.json();
@@ -64,15 +91,6 @@ export default {
       .then(myJson => {
         console.log(myJson);
         this.products = myJson;
-      });
-
-      fetch("mocks/decorators.json")
-      .then(response => {
-        return response.json();
-      })
-      .then(myJson => {
-        console.log(myJson);
-        this.decorators = myJson;
       });
   }
 };
@@ -95,38 +113,26 @@ export default {
   grid-column-gap: 15px;
   grid-row-gap: 15px;
   display: grid;
-}
-.container-col .item {
-  /* border: solid black 1px; */
-  max-width: 250px;
+  grid-auto-flow: dense;
 }
 
 .container-col .item img {
   width: 100%;
-  /* height: auto; */
-}
-
-.two-col {
-  grid-column: span 2;
-  /* border: solid black 1px; */
-  /* background-color: rgb(163, 194, 240); */
-}
-
-.left {
-  grid-column-start: 1;
-  grid-column-end: 3;
-}
-
-.right {
-  grid-column-end: 3;
+  height: auto;
+  object-fit: cover;
 }
 
 .left,
 .right {
+  grid-column: 1 / -1;
   height: auto;
 }
 
-.full {
+.side-by-side {
+  grid-column: 1 / -1;
+}
+
+.fill {
   grid-column: 1 / -1;
   /* height: 250px; */
   /* border: solid black 1px; */
@@ -134,23 +140,42 @@ export default {
   grid-auto-rows: auto;
 }
 
+.img-decorated {
+  max-height: 200px;
+}
+
+.decorated {
+    max-width: 75vw !important;
+    grid-column: span 2 !important;
+}
 
 @media screen and (min-width: 600px) {
   .container-col {
     grid-auto-rows: auto;
-    grid-template-columns: repeat(3, 1fr);
+    grid-auto-flow: row;
+    grid-template-columns: repeat(6, 1fr);
     grid-column-gap: 15px;
     grid-row-gap: 15px;
     display: grid;
   }
 
+  .container-col .item {
+    /* border: solid black 1px; */
+    grid-column: span 2;
+  }
+
   .left {
-    grid-column-start: 1;
-    grid-column-end: 3;
+    grid-column: 1 / 5;
   }
 
   .right {
-    grid-column-end: 4;
+    grid-column-start: 7;
+    grid-column-end: 3;
+  }
+
+  .decorated {
+    max-width: 25vw !important;
+    grid-column: span 3 !important;
   }
 }
 

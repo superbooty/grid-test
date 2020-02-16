@@ -1,24 +1,32 @@
 [
     {
-      "row": 3,
+        "row": 2,
+        "context" : "commerce"
+    },
+    {
+        "row": 4,
+        "context" : "commerce"
+    },
+    {
+      "row": 4,
       "pos": "left",
-      "type": "two-col",
+      "context" : "content",
       "content": {
         "url": "https://images.contentstack.io/v3/assets/blt2d702d64bab5cd4d/blt04212de7f2aedc90/5e3030fbe147ae4537d92d1f/sh_50193_chino.jpg?width=1030&format=pjpg&quality=90"
         }
     },
     {
-      "row": 5,
+      "row": 6,
       "pos": "right",
-      "type": "two-col",
+      "context" : "content",
       "content": {
         "url": "https://images.contentstack.io/v3/assets/blt2d702d64bab5cd4d/blt2b2050905f6ee60e/5e2edce438beb045b8566bf3/20_H1_LVC_HomepageA2_Desktop.jpg?width=538&format=pjpg&quality=90"
         }
     },
     {
-      "row": 6,
-      "pos": "none",
-      "type": "full",
+      "row": 10,
+      "pos": "fill",
+      "context" : "content",
       "content": {
         "url": "https://lsco.scene7.com/is/image/lsco/19_KDP_Desktop_mock_header_asset?$ZF$&wid=3072"
         }
