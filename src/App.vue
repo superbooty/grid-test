@@ -4,6 +4,22 @@
     <HelloWorld msg="Welcome to Your Vue.js App" />
     <div class="page">
       <div v-if="decorators != null" class="container-col">
+        <template v-for="commerce in computedCommerce">
+          <template v-if="commerce.isDecorated">
+            <div class="item decorated"
+            :style="{'grid-row': commerce.decorator.row}" :key="commerce.product.code">
+              <img :class="{'img-decorated': commerce.isDecorated}" :src="commerce.product.images[3].url" />
+              <div>{{commerce.product.name}}</div>
+              <div>{{commerce.product.price.formattedValue}}</div>
+            </div>
+          </template>
+          <div v-else class="item"
+            :key="commerce.product.code">
+            <img :class="{'img-decorated': commerce.isDecorated}" :src="commerce.product.images[3].url" />
+            <div>{{commerce.product.name}}</div>
+            <div>{{commerce.product.price.formattedValue}}</div>
+          </div>
+        </template>
         <template v-for="(d, i) in decorators">
           <div
             v-if="d.context == 'content'"
@@ -12,13 +28,6 @@
             :key="`${d.row}-d-${i}`"
           >
             <decorator :content="d.content"></decorator>
-          </div>
-        </template>
-        <template v-for="commerce in computedCommerce">
-          <div class="item" :class="{decorated: commerce.isDecorated}" :key="commerce.product.code">
-            <img :class="{'img-decorated': commerce.isDecorated}" :src="commerce.product.images[3].url" />
-            <div>{{commerce.product.name}}</div>
-            <div>{{commerce.product.price.formattedValue}}</div>
           </div>
         </template>
       </div>
@@ -55,6 +64,17 @@ export default {
         return decorators.length > 0 && (itemPlacement == 1 || itemPlacement == 2);
       }
       return false;
+    },
+    getCommerceDecorator(i) {
+      let rowNum = (i + this.cols) / this.cols;
+      rowNum = rowNum | 0;
+      let decorators = null;
+      if (this.decorators != null) {
+        decorators = this.decorators.filter(decorator => {
+          return decorator.row == rowNum && decorator.context === "commerce";
+        });
+      }
+      return decorators.length > 0 ? decorators[0] : null;
     }
   },
   computed: {
@@ -68,7 +88,12 @@ export default {
           let commerceProduct = {
             product: product,
           }
-          commerceProduct.isDecorated = this.isDecoratedCommerce(i);
+          let decorator = null;
+          if (this.isDecoratedCommerce(i)) {
+            commerceProduct.isDecorated = this.isDecoratedCommerce(i);
+            decorator = this.getCommerceDecorator(i)
+          }
+          commerceProduct.decorator = decorator;
           commerceProducts.push(commerceProduct);
         });
       }
