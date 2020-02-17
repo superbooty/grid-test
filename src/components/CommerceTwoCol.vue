@@ -22,6 +22,7 @@ export default {
   height: 100%;
   position: relative;
 }
+
 .decorator-content img {
   width: 100%;
   height: 100%;
@@ -33,17 +34,19 @@ export default {
   background-color: #4f4f4f;
   z-index: 1000;
   opacity: 0.2;
-  height: 100%;
   width: 100%;
+  height: 100%;
   position: absolute;
 }
 
 .headline-mobile-align {
-  position: relative;
-  top: -50%;
-  color: white;
-  height: 0px;
+  position: absolute;
+  width: 100%;
+  top: 50%;
   z-index: 1001;
+  left: 50%;
+  color: white;
+  transform: translate(-50%, -50%);
 }
 
 .headline-mobile-align h3 {

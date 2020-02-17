@@ -3,9 +3,10 @@
     <div class="decorator-mask">
     </div>
     <img :src="content.url" />
-    <div class="headline-mobile-align"><h3 data-v-43ca4d66="" class="headline-text">{{content.msg}}</h3></div>
-    <div class="cta-buttons">
+    <div class="headline-mobile-align"><h3 data-v-43ca4d66="" class="headline-text">{{content.msg}}</h3>
+      <div class="cta-buttons">
         <button>SHOW ME</button>
+       </div>
     </div>
   </div>
 </template>
@@ -37,17 +38,19 @@ export default {
   background-color: #4f4f4f;
   z-index: 1000;
   opacity: 0.2;
-  height: 100%;
   width: 100%;
+  height: 100%;
   position: absolute;
 }
 
 .headline-mobile-align {
-  position: relative;
-  top: -50%;
+  position: absolute;
+  width: 100%;
+  top: 50%;
   z-index: 1001;
+  left: 50%;
   color: white;
-  height: 0px;
+  transform: translate(-50%, -50%);
 }
 
 .headline-mobile-align h3 {
@@ -58,8 +61,6 @@ export default {
 }
 
 .cta-buttons {
-  position: absolute;
-  bottom: 20vh;
   display: inline;
   z-index: 1001;
   transform: translateX(-50%);
@@ -68,7 +69,9 @@ export default {
 .cta-buttons button {
   border: 1px solid black;
   background-color: white;
-  font-size: 14px;
+  font-size: 12px!important;
+  text-decoration: none;
+  padding: 12px 27px;
   letter-spacing: 0.15em;
   min-width: 100px;
   max-width: 200px;
