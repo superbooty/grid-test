@@ -201,7 +201,8 @@ export default {
 
 .decorated {
     max-width: 75vw !important;
-    grid-column: 1/3 !important;
+    grid-column: 1 / 3 !important;
+    transition: width 250ms;
 }
 
 .logo {
@@ -237,9 +238,14 @@ export default {
   }
 
   .decorated {
-    max-width: 25vw !important;
+    width: 15vw;
     grid-column: span 3 !important;
   }
+
+  .decorated:hover {
+    width: 25vw;
+  }
+
 }
 
 .page {
