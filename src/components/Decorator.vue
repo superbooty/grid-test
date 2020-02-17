@@ -5,15 +5,17 @@
 </template>
 
 <script>
-import CommerceContentA from '../components/CommerceContentA.vue'
+const getTwoCol = () => import( '../components/CommerceTwoCol.vue');
+const getFillRow = () => import( '../components/CommerceFillRow.vue');
 
 export default {
-  name: "HelloWorld",
+  name: "Decorator",
   props: {
     content: Object
   },
   components: {
-    CommerceContentA,
+    CommerceTwoCol: getTwoCol,
+    CommerceFillRow: getFillRow,
   }
 };
 </script>
