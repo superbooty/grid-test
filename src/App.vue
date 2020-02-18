@@ -192,6 +192,7 @@ export default {
 
 .decorated {
     max-width: 100% !important;
+    width: 75%;
     grid-column: 1 / 3 !important;
     transition: width 250ms;
 }
@@ -217,6 +218,11 @@ export default {
   .container-col .item {
     /* border: solid black 1px; */
     grid-column: span 2;
+  }
+
+  .container-col .item:hover {
+    border: solid #cacaca 1px;
+    padding: 3px;
   }
 
   .left {
