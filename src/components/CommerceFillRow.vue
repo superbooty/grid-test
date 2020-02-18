@@ -51,6 +51,10 @@ export default {
   left: 50%;
   color: white;
   transform: translate(-50%, -50%);
+  justify-content: space-evenly;
+  flex-direction: column;
+  height: 100px;
+  display: flex;
 }
 
 .headline-mobile-align h3 {
@@ -63,7 +67,6 @@ export default {
 .cta-buttons {
   display: inline;
   z-index: 1001;
-  transform: translateX(-50%);
 }
 
 .cta-buttons button {

@@ -191,7 +191,7 @@ export default {
 }
 
 .decorated {
-    max-width: 75vw !important;
+    max-width: 100% !important;
     grid-column: 1 / 3 !important;
     transition: width 250ms;
 }
@@ -229,12 +229,12 @@ export default {
   }
 
   .decorated {
-    width: 15vw;
+    width: 60%;
     grid-column: span 3 !important;
   }
 
   .decorated:hover {
-    width: 25vw;
+    width: 100%;
   }
 
 }
