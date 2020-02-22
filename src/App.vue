@@ -5,18 +5,19 @@
     <div class="separator"></div>
     <div class="page">
       <div v-if="decorators != null" class="container-col">
-        <template v-for="commerce in computedCommerce">
-          <div :class="['item', commerce.isDecorated ? 'decorated' : '']"
-          :style="[commerce.isDecorated ? {'grid-row': commerce.decorator.row} : '']" :key="commerce.product.code">
+        <template v-for="(commerce, i) in computedCommerce">
+          <div class="item" :class="{decorated: commerce.decoratedRow && commerce.itemPlacement < 3 }"
+            :style="[commerce.decoratedRow && commerce.itemPlacement < 3  ? {'grid-row' : commerce.row} : '']"
+            :key="commerce.product.code" @mouseenter="toggleQickViewBtn(i)" @mouseleave="toggleQickViewBtn(i)">
             <img :class="{'img-decorated': commerce.isDecorated}" :src="commerce.product.images[3].url" />
+            <quick-view v-show="qvButtons[selected]" :class="{'one' : qvButtons}"/>
             <div>{{commerce.product.name}}</div>
             <div class="color">Color: {{commerce.product.colorName}}</div>
             <div>{{commerce.product.price.formattedValue}}</div>
           </div>
         </template>
-        <template v-for="(d, i) in decorators">
+        <template v-for="(d, i) in decorators.content">
           <div
-            v-if="d.context == 'content'"
             :class="[d.pos]"
             :style="{'grid-row': d.row}"
             :key="`${d.row}-d-${i}`"
@@ -32,6 +33,7 @@
 <script>
 import Decorator from "./components/Decorator.vue";
 import Header from "./components/Header.vue";
+import QuickView from "./components/QuickView.vue";
 
 export default {
   name: "App",
@@ -40,30 +42,34 @@ export default {
     decorators: [],
     cols: 2, // this value should come from testing the device type
     products: null,
+    qvButtonsState: [],
+    selected: 0,
   }),
   components: {
     Header,
-    Decorator
+    Decorator,
+    QuickView
   },
   methods: {
     isDecoratedCommerce(i) {
       let rowNum = (i + this.cols) / this.cols;
       rowNum = rowNum | 0;
-      let itemPlacement = (i + 1 + this.cols) - (this.cols * rowNum);
+      // let itemPlacement = (i + 1 + this.cols) - (this.cols * rowNum);
+      console.log("ROW :: ", rowNum);
       // check if item tile is decorated
-      let caonDecorateCommerce = false;
-      if (this.cols > 2 && (itemPlacement == 1 || itemPlacement == 2)) {
-        caonDecorateCommerce = true;
-      }
-      if (this.cols < 3 && itemPlacement == 1) {
-        caonDecorateCommerce = true;
-      }
-      if (this.decorators != null) {
-        const decorators = this.decorators.filter(decorator => {
-          return decorator.row == rowNum && decorator.context === "commerce";
-        });
-        return decorators.length > 0 && caonDecorateCommerce;
-      }
+      // let caonDecorateCommerce = false;
+      // if (this.cols > 2 && (itemPlacement == 1 || itemPlacement == 2)) {
+      //   caonDecorateCommerce = true;
+      // }
+      // if (this.cols < 3 && itemPlacement == 1) {
+      //   caonDecorateCommerce = true;
+      // }
+      // if (this.decorators != null) {
+      //   const decorators = this.decorators.commerce.filter(decorator => {
+      //     return decorator.row == rowNum ;
+      //   });
+      //   return decorators.length > 0 && caonDecorateCommerce;
+      // }
       return false;
     },
     getCommerceDecorator(i) {
@@ -71,30 +77,77 @@ export default {
       rowNum = rowNum | 0;
       let decorators = null;
       if (this.decorators != null) {
-        decorators = this.decorators.filter(decorator => {
-          return decorator.row == rowNum && decorator.context === "commerce";
+        decorators = this.decorators.commerce.filter(decorator => {
+          return decorator.row == rowNum ;
         });
       }
       return decorators.length > 0 ? decorators[0] : null;
+    },
+    toggleQickViewBtn(i) {
+      console.log("MOUSER");
+      this.selected = i;
+      this.qvButtonsState[i] = !this.qvButtonsState[i];
+      // this.quickViewBtnActive = !this.quickViewBtnActive;
+    },
+    isRowDecorated(row) {
+      let decorators = null;
+      if (this.decorators != null) {
+        decorators = this.decorators.content.filter(decorator => {
+          return decorator.row == row ;
+        });
+      }
+      return decorators.length > 0 ? decorators[0] : false;
+    },
+    isInDecoratedRow(commerce) {
+      let decorators = null;
+      if (this.decorators != null) {
+        decorators = this.decorators.commerce.filter(decorator => {
+          return decorator.row == commerce.row ;
+        });
+      }
+      return decorators.length > 0; 
+    },
+    canDecorate(i) {
+        return (i + 1 + 2 ) % this.cols != 0;
     }
   },
   computed: {
     currentDecorator() {
       return this.decorator;
     },
+    qvButtons() {      
+      return this.qvButtonsState;
+    },
     computedCommerce() {
       let commerceProducts = [];
+      let colsCount = 0;
       if (this.products != null) {
         this.products.forEach((product, i) => {
           let commerceProduct = {
             product: product,
           }
-          let decorator = null;
-          if (this.isDecoratedCommerce(i)) {
-            commerceProduct.isDecorated = this.isDecoratedCommerce(i);
-            decorator = this.getCommerceDecorator(i)
+          commerceProduct.isDecorated = false;
+          // let decorator = null;
+          // if (this.isDecoratedCommerce(i)) {
+          //   commerceProduct.isDecorated = this.isDecoratedCommerce(i);
+          //   decorator = this.getCommerceDecorator(i)
+          // }
+          let rowNum = (i + this.cols + colsCount) / this.cols;
+          rowNum = rowNum | 0;
+          console.log("ROW :: ", rowNum);
+          let contentDecorator = this.isRowDecorated(rowNum)
+          if (contentDecorator) {
+            colsCount += contentDecorator.cols
           }
-          commerceProduct.decorator = decorator;
+          commerceProduct.row = rowNum;
+          commerceProduct.position = (i + 1 + colsCount);
+          let itemPlacement = (commerceProduct.position + this.cols) - (this.cols * rowNum);
+          console.log('PLACE :: ', itemPlacement);
+          commerceProduct.itemPlacement = itemPlacement;
+          if (commerceProduct.row === 2) {
+            commerceProduct.decoratedRow = 2;
+          }
+          console.log('PRODUCT :: ', commerceProduct);
           commerceProducts.push(commerceProduct);
         });
       }
@@ -117,6 +170,9 @@ export default {
       .then(myJson => {
         console.log(myJson);
         this.products = myJson;
+        this.products.forEach((product, i) => {
+          this.qvButtonsState[i] = false;
+        });
       });
   },
   mounted() {
@@ -162,6 +218,7 @@ export default {
   font-weight: 400;
   text-align: left;
   line-height: 16px;
+  position: relative;
 }
 
 .item .color {

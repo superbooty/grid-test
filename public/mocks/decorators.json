@@ -1,50 +1,19 @@
-[
-    {
-        "row": 2,
-        "context" : "commerce"
-    },
-    {
-        "row": 3,
-        "context" : "commerce"
-    },
-    {
-      "row": 4,
-      "pos": "left",
-      "context" : "content",
-      "content": {
-        "url": "https://images.contentstack.io/v3/assets/blt2d702d64bab5cd4d/blt04212de7f2aedc90/5e3030fbe147ae4537d92d1f/sh_50193_chino.jpg?width=1030&format=pjpg&quality=90",
-        "msg": "The 501® '93 STRAIGHT JEANS",
-        "component": "CommerceTwoCol"
-      }
-    },
-    {
-      "row": 7,
-      "pos": "fill",
-      "context" : "content",
-      "content": {
-        "url": "https://images.contentstack.io/v3/assets/blt2d702d64bab5cd4d/bltc5b1b0c6b714c59b/5e3aeefcc77dbe6512a24d33/valentines_hero_desktop.jpg?width=1440&format=pjpg&quality=90 1x, https://images.contentstack.io/v3/assets/blt2d702d64bab5cd4d/bltc5b1b0c6b714c59b/5e3aeefcc77dbe6512a24d33/valentines_hero_desktop.jpg?width=1872&format=pjpg&quality=90 2x",
-        "msg": "MAKE THEM YOUR OWN",
-        "component": "CommerceFillRow"
-      }
-    },
-    {
-      "row": 6,
-      "pos": "right",
-      "context" : "content",
-      "content": {
-        "url": "https://images.contentstack.io/v3/assets/blt2d702d64bab5cd4d/blt2b2050905f6ee60e/5e2edce438beb045b8566bf3/20_H1_LVC_HomepageA2_Desktop.jpg?width=538&format=pjpg&quality=90",
-        "msg": "LIVE IN LEVIS® ",
-        "component": "CommerceTwoCol"
-      }
-    },
-    {
-      "row": 1,
-      "pos": "fill",
-      "context" : "content",
-      "content": {
-        "url": "https://lsco.scene7.com/is/image/lsco/19_KDP_Desktop_mock_header_asset?$ZF$&wid=3072",
-        "msg": "Styles that kids want",
-        "component": "CommerceFillRow"
-      }
-    }
-]
+{
+    "commerce": [
+        {
+          "row" : 2
+        }
+    ],
+    "content": [
+        {
+            "row": 1,
+            "pos": "left",
+            "cols" : 2,
+            "content": {
+                "url": "https://images.contentstack.io/v3/assets/blt2d702d64bab5cd4d/blt04212de7f2aedc90/5e3030fbe147ae4537d92d1f/sh_50193_chino.jpg?width=1030&format=pjpg&quality=90",
+                "msg": "The 501® '93 STRAIGHT JEANS",
+                "component": "CommerceTwoCol"
+            }
+        }
+    ]
+}
