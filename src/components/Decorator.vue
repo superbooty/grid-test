@@ -7,6 +7,7 @@
 <script>
 const getTwoCol = () => import( '../components/CommerceTwoCol.vue');
 const getFillRow = () => import( '../components/CommerceFillRow.vue');
+const getGriddy = () => import( '../components/Griddy.vue');
 
 export default {
   name: "Decorator",
@@ -16,6 +17,7 @@ export default {
   components: {
     CommerceTwoCol: getTwoCol,
     CommerceFillRow: getFillRow,
+    Griddy: getGriddy,
   }
 };
 </script>

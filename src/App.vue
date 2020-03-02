@@ -8,12 +8,13 @@
         <template v-for="(commerce, i) in computedCommerce">
           <div class="item" :class="{decorated: commerce.decoratedRow && commerce.itemPlacement < 3 }"
             :style="[commerce.decoratedRow && commerce.itemPlacement < 3  ? {'grid-row' : commerce.row} : '']"
-            :key="commerce.product.code" @mouseenter="toggleQickViewBtn(i)" @mouseleave="toggleQickViewBtn(i)">
-            <img :class="{'img-decorated': commerce.isDecorated}" :src="commerce.product.images[3].url" />
-            <quick-view v-show="qvButtons[selected]" :class="{'one' : qvButtons}"/>
+            :key="commerce.product.code" @mouseenter="showATCButton(i)" @mouseleave="hideATCButton(i)">
+            <img :class="{'img-decorated': commerce.decoratedRow && commerce.itemPlacement < 3}" :src="commerce.product.images[3].url" />
+            <add-to-bag-btn v-if="qvButtons[i]" :index=i @showMyModal="showMyModal" />
             <div>{{commerce.product.name}}</div>
             <div class="color">Color: {{commerce.product.colorName}}</div>
             <div>{{commerce.product.price.formattedValue}}</div>
+            <add-to-bag-modal v-if="showModal[i]" :code=commerce.product.code @closeModal="closeModal(i)"/>
           </div>
         </template>
         <template v-for="(d, i) in decorators.content">
@@ -33,7 +34,8 @@
 <script>
 import Decorator from "./components/Decorator.vue";
 import Header from "./components/Header.vue";
-import QuickView from "./components/QuickView.vue";
+import AddToBagBtn from "./components/AddToBagBtn.vue";
+import AddToBagModal from "./components/AddToBagModal.vue"
 
 export default {
   name: "App",
@@ -43,51 +45,28 @@ export default {
     cols: 2, // this value should come from testing the device type
     products: null,
     qvButtonsState: [],
-    selected: 0,
+    showModal: [],
+    selected: -1,
   }),
   components: {
     Header,
     Decorator,
-    QuickView
+    AddToBagBtn,
+    AddToBagModal,
   },
   methods: {
-    isDecoratedCommerce(i) {
-      let rowNum = (i + this.cols) / this.cols;
-      rowNum = rowNum | 0;
-      // let itemPlacement = (i + 1 + this.cols) - (this.cols * rowNum);
-      console.log("ROW :: ", rowNum);
-      // check if item tile is decorated
-      // let caonDecorateCommerce = false;
-      // if (this.cols > 2 && (itemPlacement == 1 || itemPlacement == 2)) {
-      //   caonDecorateCommerce = true;
-      // }
-      // if (this.cols < 3 && itemPlacement == 1) {
-      //   caonDecorateCommerce = true;
-      // }
-      // if (this.decorators != null) {
-      //   const decorators = this.decorators.commerce.filter(decorator => {
-      //     return decorator.row == rowNum ;
-      //   });
-      //   return decorators.length > 0 && caonDecorateCommerce;
-      // }
-      return false;
+    showMyModal(arg) {
+      console.log("ARG :: ", arg);
+      this.$set(this.showModal, this.selected, false);
+      this.selected = arg;
+      this.$set(this.showModal, arg, true);
     },
-    getCommerceDecorator(i) {
-      let rowNum = (i + this.cols) / this.cols;
-      rowNum = rowNum | 0;
-      let decorators = null;
-      if (this.decorators != null) {
-        decorators = this.decorators.commerce.filter(decorator => {
-          return decorator.row == rowNum ;
-        });
-      }
-      return decorators.length > 0 ? decorators[0] : null;
-    },
-    toggleQickViewBtn(i) {
-      console.log("MOUSER");
-      this.selected = i;
-      this.qvButtonsState[i] = !this.qvButtonsState[i];
+    showATCButton(i) {
+      this.$set(this.qvButtonsState, i, true);
       // this.quickViewBtnActive = !this.quickViewBtnActive;
+    },
+    hideATCButton(i) {
+      this.$set(this.qvButtonsState, i, false);
     },
     isRowDecorated(row) {
       let decorators = null;
@@ -98,17 +77,8 @@ export default {
       }
       return decorators.length > 0 ? decorators[0] : false;
     },
-    isInDecoratedRow(commerce) {
-      let decorators = null;
-      if (this.decorators != null) {
-        decorators = this.decorators.commerce.filter(decorator => {
-          return decorator.row == commerce.row ;
-        });
-      }
-      return decorators.length > 0; 
-    },
-    canDecorate(i) {
-        return (i + 1 + 2 ) % this.cols != 0;
+    closeModal() {
+      this.$set(this.showModal, this.selected, false);
     }
   },
   computed: {
@@ -127,11 +97,6 @@ export default {
             product: product,
           }
           commerceProduct.isDecorated = false;
-          // let decorator = null;
-          // if (this.isDecoratedCommerce(i)) {
-          //   commerceProduct.isDecorated = this.isDecoratedCommerce(i);
-          //   decorator = this.getCommerceDecorator(i)
-          // }
           let rowNum = (i + this.cols + colsCount) / this.cols;
           rowNum = rowNum | 0;
           console.log("ROW :: ", rowNum);
@@ -172,6 +137,7 @@ export default {
         this.products = myJson;
         this.products.forEach((product, i) => {
           this.qvButtonsState[i] = false;
+          this.showModal[i] = false;
         });
       });
   },
@@ -186,7 +152,10 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+@import "assets/scss/_variables.scss";
+@import "assets/scss/lscoicons.scss";
+@import "assets/scss/levi-fonts.scss";
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antiadivased;
@@ -301,6 +270,7 @@ export default {
   }
 
 }
+
 
 .page {
   max-width: 800px;
