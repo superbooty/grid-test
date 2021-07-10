@@ -5,28 +5,32 @@
     <div class="separator"></div>
     <div class="page">
       <div v-if="decorators != null" class="container-col">
-        <template v-for="(commerce, i) in computedCommerce">
-          <div class="item" :class="{decorated: commerce.decoratedRow && commerce.itemPlacement < 3 }"
-            :style="[commerce.decoratedRow && commerce.itemPlacement < 3  ? {'grid-row' : commerce.row} : '']"
-            :key="commerce.product.code" @mouseenter="showATCButton(i)" @mouseleave="hideATCButton(i)">
+        <div v-for="(commerce, i) in computedCommerce"
+          class="item" :class="{decorated: commerce.decoratedRow && commerce.itemPlacement < 3 }"
+          :style="[commerce.decoratedRow && commerce.itemPlacement < 3  ? {'grid-row' : commerce.row} : '']"
+          :key="commerce.product.code" @mouseenter="showATCButton(i)" @mouseleave="hideATCButton(i)">
+          <div class="item-inner">
             <img :class="{'img-decorated': commerce.decoratedRow && commerce.itemPlacement < 3}" :src="commerce.product.images[3].url" />
-            <add-to-bag-btn v-if="qvButtons[i]" :index=i @showMyModal="showMyModal" />
+            <div v-if="!commerce.product.customizable">
+              <add-to-bag-btn v-if="qvButtons[i] && !atcModals[i]" :index=i @showMyModal="showMyModal" />
+              <add-to-bag-modal v-if="atcModals[i]" :code=commerce.product.code @closeModal="closeModal(i)"/>
+            </div>
+          </div>
             <div>{{commerce.product.name}}</div>
             <div class="color">Color: {{commerce.product.colorName}}</div>
             <div>{{commerce.product.price.formattedValue}}</div>
-            <add-to-bag-modal v-if="showModal[i]" :code=commerce.product.code @closeModal="closeModal(i)"/>
-          </div>
-        </template>
-        <template v-for="(d, i) in decorators.content">
-          <div
-            :class="[d.pos]"
-            :style="{'grid-row': d.row}"
-            :key="`${d.row}-d-${i}`"
-          >
-            <decorator :content="d.content"></decorator>
-          </div>
-        </template>
+        </div>
+        <div
+          v-for="(d, i) in decorators.content"
+          :class="[d.pos]"
+          :style="{'grid-row': d.row}"
+          :key="`${d.row}-d-${i}`"
+        >
+          <decorator :content="d.content"></decorator>
+        </div>
       </div>
+      <item-selector :items="products"></item-selector>
+      <shoppable-video></shoppable-video>
     </div>
   </div>
 </template>
@@ -35,98 +39,35 @@
 import Decorator from "./components/Decorator.vue";
 import Header from "./components/Header.vue";
 import AddToBagBtn from "./components/AddToBagBtn.vue";
-import AddToBagModal from "./components/AddToBagModal.vue"
+import ItemSelector from "./components/ItemSelector.vue";
+import ShoppableVideo from "./components/ShoppableVideo.vue";
+const AddToBagModal = defineAsyncComponent(
+  () => import('./components/AddToBagModal.vue')
+);
+// import AddToBagModal from "./components/AddToBagModal.vue"
+
+import {ref, computed, defineAsyncComponent} from 'vue';
 
 export default {
   name: "App",
-  
-  data: () => ({
-    decorators: [],
-    cols: 2, // this value should come from testing the device type
-    products: null,
-    qvButtonsState: [],
-    showModal: [],
-    selected: -1,
-  }),
-  components: {
-    Header,
-    Decorator,
-    AddToBagBtn,
-    AddToBagModal,
-  },
-  methods: {
-    showMyModal(arg) {
-      console.log("ARG :: ", arg);
-      this.$set(this.showModal, this.selected, false);
-      this.selected = arg;
-      this.$set(this.showModal, arg, true);
-    },
-    showATCButton(i) {
-      this.$set(this.qvButtonsState, i, true);
-      // this.quickViewBtnActive = !this.quickViewBtnActive;
-    },
-    hideATCButton(i) {
-      this.$set(this.qvButtonsState, i, false);
-    },
-    isRowDecorated(row) {
-      let decorators = null;
-      if (this.decorators != null) {
-        decorators = this.decorators.content.filter(decorator => {
-          return decorator.row == row ;
-        });
-      }
-      return decorators.length > 0 ? decorators[0] : false;
-    },
-    closeModal() {
-      this.$set(this.showModal, this.selected, false);
-    }
-  },
-  computed: {
-    currentDecorator() {
-      return this.decorator;
-    },
-    qvButtons() {      
-      return this.qvButtonsState;
-    },
-    computedCommerce() {
-      let commerceProducts = [];
-      let colsCount = 0;
-      if (this.products != null) {
-        this.products.forEach((product, i) => {
-          let commerceProduct = {
-            product: product,
-          }
-          commerceProduct.isDecorated = false;
-          let rowNum = (i + this.cols + colsCount) / this.cols;
-          rowNum = rowNum | 0;
-          console.log("ROW :: ", rowNum);
-          let contentDecorator = this.isRowDecorated(rowNum)
-          if (contentDecorator) {
-            colsCount += contentDecorator.cols
-          }
-          commerceProduct.row = rowNum;
-          commerceProduct.position = (i + 1 + colsCount);
-          let itemPlacement = (commerceProduct.position + this.cols) - (this.cols * rowNum);
-          console.log('PLACE :: ', itemPlacement);
-          commerceProduct.itemPlacement = itemPlacement;
-          if (commerceProduct.row === 2) {
-            commerceProduct.decoratedRow = 2;
-          }
-          console.log('PRODUCT :: ', commerceProduct);
-          commerceProducts.push(commerceProduct);
-        });
-      }
-      return commerceProducts;
-    }
-  },
-  created() {
+
+  setup(props) {
+    console.log("PROPS :: ", props);
+
+    const qvButtonState = ref([]);
+    const products = ref(null);
+    const decorators = ref([]);
+    const atcModals = ref([]);
+    const selected = ref(-1);
+    const cols = ref(2); // this value should come from testing the device type
+    
     fetch("mocks/decorators.json")
       .then(response => {
         return response.json();
       })
       .then(myJson => {
         console.log(myJson);
-        this.decorators = myJson;
+        decorators.value = myJson;
       });
     fetch("mocks/products.json")
       .then(response => {
@@ -134,12 +75,107 @@ export default {
       })
       .then(myJson => {
         console.log(myJson);
-        this.products = myJson;
-        this.products.forEach((product, i) => {
-          this.qvButtonsState[i] = false;
-          this.showModal[i] = false;
+        products.value = myJson;
+        products.value.forEach((product, i) => {
+          qvButtonState.value[i] = false;
+          atcModals.value[i] = false;
         });
       });
+    
+    fetch("https://udc6hc9di5.execute-api.us-west-2.amazonaws.com/default/putmetadata", {
+      method: "POST",
+      mode: "cors",
+      data: {
+        channelArn: 'arn:aws:ivs:us-west-2:497531642140:channel/1wZsrjIZeadM', 
+        metadata: '{"productId": "756450002"}'
+      }
+    }).then((resp) => {
+      console.log(resp.json());
+    })
+
+    const isRowDecorated = (row) => {
+      let decs = null;
+      if (decs != null) {
+        decs = decorators.value.content.filter(decorator => {
+          return decorator.row == row ;
+        });
+      }
+      return decs != null && decs.length > 0 ? decs[0] : false;
+    }
+
+    const showATCButton = (i) => {
+      qvButtonState.value[i] = true;
+      // this.quickViewBtnActive = !this.quickViewBtnActive;
+    };
+
+    const hideATCButton = (i) => {
+      qvButtonState.value[i] = false;
+    };
+
+    const qvButtons = computed(() => {      
+      return qvButtonState.value;
+    });
+
+    const showMyModal = (arg) => {
+      console.log("ARG :: ", arg);
+      atcModals.value[selected.value] = false;
+      // vm.set(this.showModal, this.selected, false);
+      selected.value = arg;
+      atcModals.value[selected.value] = true;
+      console.log("SELECTED :: ", selected.value, atcModals.value);
+    };
+
+    const closeModal = () => {
+      atcModals.value[selected.value] = false;
+    }
+
+    const computedCommerce = computed(() => {
+      let commerceProducts = [];
+      let colsCount = 0;
+      if (products.value != null) {
+        products.value.forEach((product, i) => {
+          let commerceProduct = {
+            product: product,
+          }
+          commerceProduct.isDecorated = false;
+          let rowNum = (i + cols.value + colsCount) / cols.value;
+          rowNum = rowNum | 0;
+          console.log("ROW :: ", rowNum);
+          let contentDecorator = isRowDecorated(rowNum)
+          if (contentDecorator) {
+            colsCount += contentDecorator.cols
+          }
+          commerceProduct.row = rowNum;
+          commerceProduct.position = (i + 1 + colsCount);
+          let itemPlacement = (commerceProduct.position + cols.value) - (cols.value * rowNum);
+          console.log('PLACE :: ', itemPlacement);
+          commerceProduct.itemPlacement = itemPlacement;
+          if (commerceProduct.row === 3) {
+            commerceProduct.decoratedRow = 3;
+          }
+          console.log('PRODUCT :: ', commerceProduct);
+          commerceProducts.push(commerceProduct);
+        });
+      }
+      return commerceProducts;
+    });
+
+    return {
+      qvButtonState, decorators,
+      products, computedCommerce, qvButtons,
+      atcModals, showATCButton, hideATCButton,
+      showMyModal, closeModal,
+    }
+
+  },
+
+  components: {
+    Header,
+    Decorator,
+    AddToBagBtn,
+    AddToBagModal,
+    ItemSelector,
+    ShoppableVideo,
   },
   mounted() {
     const width = window.innerWidth;
@@ -157,7 +193,7 @@ export default {
 @import "assets/scss/lscoicons.scss";
 @import "assets/scss/levi-fonts.scss";
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: $helvetica-now;
   -webkit-font-smoothing: antiadivased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -182,7 +218,7 @@ export default {
 }
 
 .container-col .item {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: $helvetica-now;
   font-size: 13px;
   font-weight: 400;
   text-align: left;
@@ -213,7 +249,7 @@ export default {
 }
 
 .img-decorated {
-  max-height: 200px;
+  max-height: 400px;
 }
 
 .decorated {
@@ -242,12 +278,18 @@ export default {
   }
 
   .container-col .item {
-    /* border: solid black 1px; */
+    // border: solid white 1px;
     grid-column: span 2;
+    padding: 3px;
+  }
+
+  .container-col .item .item-inner {
+    /* border: solid black 1px; */
+    // padding: 3px;
   }
 
   .container-col .item:hover {
-    border: solid #cacaca 1px;
+    outline: solid #cacaca 1px;
     padding: 3px;
   }
 
@@ -261,7 +303,7 @@ export default {
   }
 
   .decorated {
-    width: 60%;
+    width: 65%;
     grid-column: span 3 !important;
   }
 

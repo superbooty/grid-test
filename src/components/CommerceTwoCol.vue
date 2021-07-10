@@ -2,7 +2,9 @@
   <div class="decorator-content">
     <div class="decorator-mask">
     </div>
-    <img :src="content.url" />
+    <video class="inline-video" v-if="content.type === 'video'" :src="content.url"
+    alt="asdf" autoplay="autoplay" loop="loop" muted="muted" playsinline=""></video>
+    <img v-else :src="content.url" />
     <div class="headline-mobile-align"><h3 data-v-43ca4d66="" class="headline-text">{{content.msg}}</h3></div>
   </div>
 </template>
@@ -27,6 +29,12 @@ export default {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: cover;
+}
+
+.inline-video {
+  height: 100%;
+  width: 100%;
   object-fit: cover;
 }
 
